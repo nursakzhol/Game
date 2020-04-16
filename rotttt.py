@@ -192,7 +192,7 @@ class Tank(pygame.sprite.Sprite):
         self.dx = 0
         self.dy = 0
 
-        self.forward = 1
+        self.forward = 0
 
 
 
