@@ -2,16 +2,13 @@
 import pygame
 import math
 pygame.init()
-pygame.mixer.music.load('c26baac1db252bd.mp3')
+
 
 kuk = pygame.image.load('252.png')
 
 class Screen(object):
     width = 640
     height = 480
-    hw = width/2
-    hh = height/2
-    area = width*height
     fps = 60
 win = pygame.display.set_mode((Screen.width, Screen.height))
 class Bullet(pygame.sprite.Sprite):
@@ -35,6 +32,8 @@ class Bullet(pygame.sprite.Sprite):
         self.pos = self.head.pos[:]
         self.calculate_origin()
         self.update()
+        self.x = 0
+        self.y = 0
 
     def calculate_heading(self):
         self.radius = Bullet.side
@@ -73,9 +72,13 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
         elif self.pos[1] > Screen.height:
             self.kill()
-
+        print(self.dx)
         self.rect.centerx = round(self.pos[0], 0)
         self.rect.centery = round(self.pos[1], 0)
+
+    def get_coorsinate(self):
+        return self.pos[1]
+
 
 
 
@@ -105,6 +108,8 @@ class Tank(pygame.sprite.Sprite):
     tankLeftkey = (pygame.K_a, pygame.K_LEFT)
     tankRightkey = (pygame.K_d, pygame.K_RIGHT)
     color = ((3, 94, 0), (190, 0, 0))
+    u = 0
+    j = 0
 
     def __init__(self, startpos=(150, 150), angle=0):
         self.number = Tank.number
@@ -112,7 +117,7 @@ class Tank(pygame.sprite.Sprite):
         Tank.book[self.number] = self
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.pos = [startpos[0], startpos[1]]
-        self.hitbox = (75, 75, 75 ,75)
+
         self.dx = 0
         self.dy = 0
         self.ammo = 30
@@ -120,7 +125,7 @@ class Tank(pygame.sprite.Sprite):
         self.color =  Tank.color[self.number]
         self.turretAngle = angle
         self.tankAngle = angle
-
+        self.hitbox = pygame.Rect(self.dx, self.dy, 75  , 75)
         self.fireKey = Tank.fireKey[self.number]
         self.turretLeftkey = Tank.turretLeftkey[self.number]
         self.turretRightkey = Tank.turretRightkey[self.number]
@@ -159,7 +164,7 @@ class Tank(pygame.sprite.Sprite):
         self.turndirection = 0
         if pressedkeys[self.turretLeftkey]:
             self.turndirection += 1
-            print(self.pos)
+
 
         if pressedkeys[self.turretRightkey]:
             self.turndirection -= 1
@@ -192,12 +197,12 @@ class Tank(pygame.sprite.Sprite):
         self.dx = 0
         self.dy = 0
 
-        self.forward = 0
+        self.forward = 1
 
 
 
-        if pressedkeys[self.forwardkey]:
-            self.forward = 1
+        if pressedkeys[pygame.K_KP1]:
+            self.forward = 0
 
 
         if pressedkeys[self.backwardkey]:
@@ -224,6 +229,7 @@ class Tank(pygame.sprite.Sprite):
 
         self.rect.centerx = round(self.pos[0], 0)
         self.rect.centery = round(self.pos[1], 0)
+
 
 class Turret(pygame.sprite.Sprite):
 
@@ -284,6 +290,7 @@ def main():
     Bullet.groups = bulletgroup, allgroup
     player1 = Tank((150, 250), 90)
     player2 = Tank((450, 250), -90)
+    bullet1 = Bullet(player1)
     mainloop = True
 
     while mainloop:
@@ -291,7 +298,7 @@ def main():
         milliseconds = clock.tick(Screen.fps)
         seconds = milliseconds / 1000.0  # seconds passed since last frame (float)
         playtime += seconds
-
+        bullet1.get_coorsinate()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # pygame window closed by user
@@ -299,16 +306,17 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     mainloop = False  # exit game
+                if event.key == pygame.K_SPACE:
+                    print(bullet1.calculate_heading(), player2.pos)
         kuk = pygame.image.load('252.png').convert()
 
 
+
         win.blit(kuk, (0, 0))
-
-
         allgroup.update(seconds)
         allgroup.draw(win)
         pygame.display.flip()
-    return 0
+
 
 
 
